@@ -5,10 +5,10 @@ This script minifies all recently changed CSS and JS files placed under the give
 then it goes, and updates all HTML files that reference them by replacing URL argument
 of format "v20140125-1013" with the latest timestamp.
 
-The following Internet services are used by this script:
+The following Internet services are in use by this script:
 
-	* cssminifier.com - Used for minifying CSS files.
-	* closure-compiler.appspot.com - Used for minifying JS files.
+ * [cssminifier.com](cssminifier.com)
+ * [closure-compiler.appspot.com](closure-compiler.appspot.com)
 
 
 ### Usage ###
