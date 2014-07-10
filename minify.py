@@ -70,9 +70,10 @@ def is_js_or_css(f):
 	return f.endswith(".js") or f.endswith(".css")
 
 if __name__ == '__main__':
-	prefix = "."
-	if len(sys.argv) == 2:
-		prefix = sys.argv[1]
+	if len(sys.argv) != 2:
+		sys.exit('Usage: %s <static files prefix>' % sys.argv[0])
+
+	prefix = sys.argv[1]
 
 	processed = []
 	for dname, dirs, files in os.walk(prefix):

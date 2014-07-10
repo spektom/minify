@@ -13,9 +13,11 @@ The following Internet services are in use by this script:
 
 ### Usage ###
 
-To minify all CSS and JS files that reside in folder "static/" invoke the following command:
+`minify.py <static files prefix>`
+
+For example, to minify all CSS and JS files that reside in folder "static/"
+invoke the following command:
 
   `./minify.py static/`
 
-By default, minify.py will look for JS and CSS files starting from the current directory (".").
 
