@@ -1,11 +1,11 @@
 #!/usr/bin/env python2.7
 
-import httplib, urllib, sys, glob, os.path, re, json, datetime
+import httplib, urllib, sys, glob, os.path, re, json, datetime, socket
 
-HTML_EXT = ('.py', '.html', '.js')
+HTML_EXT = (".py", ".html", ".js")
 
 def minified_name(f):
-	return re.sub('\.([^\.]*)$', '.min.\\1', f)
+	return re.sub("\.([^\.]*)$", ".min.\\1", f)
 
 # Reads response from the service, and writes the result
 # into the minified version file.
@@ -19,37 +19,44 @@ def read_response(f, conn):
 	if (len(data) < 3):
 		sys.exit("\nERROR: can't process %s" % f)
 
-	with open(minified_name(f), 'w') as w:
+	with open(minified_name(f), "w") as w:
 		w.write(data)
 	print "Written %s" % minified_name(f)
 
 # Minify CSS file
 def css_minify(f):
 	print "Minifying CSS %s" % f
-	data = { "input" : file(f, 'r').read() }
-	headers = { "Content-type": "application/json" }
-	conn = httplib.HTTPConnection('cssminifier.com')
-	conn.request('POST', '/raw', json.dumps(data), headers)
-	read_response(f, conn)
+	try:
+		data = { "input" : file(f, "r").read() }
+		headers = { "Content-type": "application/json" }
+		conn = httplib.HTTPConnection("cssminifier.com", timeout=3)
+		conn.request("POST", "/raw", json.dumps(data), headers)
+		read_response(f, conn)
+	except socket.timeout:
+		params = urllib.urlencode({"file1": file(f, "r").read()})
+		headers = {"Content-Type": "application/x-www-form-urlencoded"}
+		conn = httplib.HTTPConnection("reducisaurus.appspot.com", timeout=3)
+		conn.request("POST", "/css", params, headers)
+		read_response(f, conn)
 
 # Compile JS file
 def js_compile(f):
 	print "Compiling JS %s" % f
 	params = urllib.urlencode([
-		('js_code', file(f, 'r').read()),
-		('compilation_level', 'SIMPLE_OPTIMIZATIONS'),
-		('output_format', 'text'),
-		('output_info', 'compiled_code'),
+		("js_code", file(f, "r").read()),
+		("compilation_level", "SIMPLE_OPTIMIZATIONS"),
+		("output_format", "text"),
+		("output_info", "compiled_code"),
 	])
 	headers = { "Content-type": "application/x-www-form-urlencoded" }
-	conn = httplib.HTTPConnection('closure-compiler.appspot.com')
-	conn.request('POST', '/compile', params, headers)
+	conn = httplib.HTTPConnection("closure-compiler.appspot.com")
+	conn.request("POST", "/compile", params, headers)
 	read_response(f, conn)
 
 # Updates timestamps
 def update_timestamps(m):
-	cur_time = datetime.datetime.now().strftime('v%Y%m%d-%H%M')
-	file_re = re.compile('(%s.*)v\d{8}\-\d{4}' % re.escape(m))
+	cur_time = datetime.datetime.now().strftime("v%Y%m%d-%H%M")
+	file_re = re.compile("(%s.*)v\d{8}\-\d{4}" % re.escape(m))
 
 	for dname, dirs, files in os.walk("."):
 		for fname in files:
@@ -59,7 +66,7 @@ def update_timestamps(m):
 					s = f.read()
 					if file_re.search(s):
 						print "Updating HTML file %s" % fpath 
-						s = file_re.sub('\\1%s' % cur_time, s)
+						s = file_re.sub("\\1%s" % cur_time, s)
 						with open("%s" % fpath, "w") as f:
 							f.write(s)
 
@@ -69,9 +76,9 @@ def is_minified(f):
 def is_js_or_css(f):
 	return f.endswith(".js") or f.endswith(".css")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 	if len(sys.argv) != 2:
-		sys.exit('Usage: %s <static files prefix>' % sys.argv[0])
+		sys.exit("Usage: %s <static files prefix>" % sys.argv[0])
 
 	prefix = sys.argv[1]
 
