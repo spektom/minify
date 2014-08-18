@@ -8,6 +8,7 @@ of format "v20140125-1013" with the latest timestamp.
 The following Internet services are in use by this script:
 
  * [cssminifier.com](cssminifier.com)
+ * [reducisaurus.appspot.com](reducisaurus.appspot.com)
  * [closure-compiler.appspot.com](closure-compiler.appspot.com)
 
 
