@@ -53,17 +53,24 @@ def css_minify(f):
 
 # Compile JS file
 def js_compile(f):
-	print "Compiling JS %s [using closure-compiler.appspot.com]" % f
-	params = urllib.urlencode([
-		("js_code", file(f, "r").read()),
-		("compilation_level", "SIMPLE_OPTIMIZATIONS"),
-		("output_format", "text"),
-		("output_info", "compiled_code"),
-	])
-	headers = { "Content-type": "application/x-www-form-urlencoded" }
-	conn = httplib.HTTPConnection("closure-compiler.appspot.com")
-	conn.request("POST", "/compile", params, headers)
-	read_response(f, conn)
+	content = file(f, "r").read()
+	try:
+		print "Compiling JS %s [using closure-compiler.appspot.com]" % f
+		params = urllib.urlencode([
+			("js_code", content),
+			("compilation_level", "SIMPLE_OPTIMIZATIONS"),
+			("output_format", "text"),
+			("output_info", "compiled_code"),
+		])
+		headers = { "Content-type": "application/x-www-form-urlencoded" }
+		conn = httplib.HTTPConnection("closure-compiler.appspot.com", timeout=3)
+		conn.request("POST", "/compile", params, headers)
+		read_response(f, conn)
+	except:
+		# Try another service:
+		print "Minifying JS %s [using cnvyr.io]" % f
+		r = requests.post("http://srv.cnvyr.io/v1?min=js", files={"files0": content}, timeout=3)
+		write_minified_file(f, r.text.replace("/*** files0 ***/", "").strip())
 
 # Updates timestamps
 def update_timestamps(m):
