@@ -22,7 +22,7 @@ def read_response(f, conn):
 		sys.exit("\nWrong HTTP status: %d\n%s" % (response.status, data))
 
 	if (len(data) < 3):
-		sys.exit("\nERROR: can't process %s" % f)
+		sys.exit("\nERROR: can't process %s." % f)
 
 	write_minified_file(f, data)
 
@@ -32,11 +32,11 @@ def css_minify(f):
 	try:
 		print "Minifying CSS %s [using cssminifier.com]" % f
 		data = { "input" : content }
-		headers = { "Content-type": "application/json" }
+		headers = { "Content-type": "application/x-www-form-urlencoded", "Accept" : "text/plain" }
 		conn = httplib.HTTPConnection("cssminifier.com", timeout=3)
-		conn.request("POST", "/raw", json.dumps(data), headers)
+		conn.request("POST", "/raw", urllib.urlencode(data), headers)
 		read_response(f, conn)
-	except socket.timeout:
+	except:
 		try:
 			# Try another service:
 			print "Minifying CSS %s [using cnvyr.io]" % f
