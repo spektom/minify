@@ -9,8 +9,12 @@ The following Internet services are in use by this script:
 
  * [cssminifier.com](cssminifier.com)
  * [cnvyr.io](cnvyr.io)
- * [reducisaurus.appspot.com](reducisaurus.appspot.com)
  * [closure-compiler.appspot.com](closure-compiler.appspot.com)
+
+
+### Prerequisites ###
+
+  * Python 3
 
 
 ### Usage ###
@@ -21,5 +25,4 @@ For example, to minify all CSS and JS files that reside in folder "static/"
 invoke the following command:
 
   `./minify.py static/`
-
 
